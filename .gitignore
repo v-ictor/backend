@@ -1,2 +1,5 @@
 node_modules
 .env
+src/uploads/images/img/*.jpeg
+src/uploads/images/img/*.jpg
+src/uploads/images/img/*.png

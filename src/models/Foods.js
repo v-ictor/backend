@@ -1,0 +1,13 @@
+const {Schema, model} = require('mongoose');
+
+const FoodsSchema = new Schema({
+    title: String,
+    description: String,
+    imageFood: {type: String, default: '/images/default/food.jpg'},
+    price: Number,
+    ingredients: String,
+    category: [{type: Schema.Types.ObjectId, ref: 'Category'}],
+    created_at : {type: Date, default: Date.now()}
+});
+
+module.exports = model('Foods', FoodsSchema);
