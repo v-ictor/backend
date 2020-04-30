@@ -47,9 +47,18 @@ module.exports = {
         }
     },
     showCtgory: async (req, res) => {
-        const {id} = req.params;
-        const category = await Category.findById(id);
-        res.status(200).json(category);
+        try {
+            const {id} = req.params;
+            const category = await Category.findById(id);
+            if(category){
+                res.status(200).json(category);
+            } else {
+                return res.status(204).json({msg:'NO CONTENT'});
+            }
+        } catch(err){
+            res.status(500).send(err);
+        }
+        
     },
     deleteCtgory: async (req, res) => {
         const {id} = req.params;
@@ -94,12 +103,21 @@ module.exports = {
         }
     },
     showCtgoryFoods: async (req, res) => {
-        const {key} = req.params;
-        const category = await Category.findOne({name: key});
-        const CtgoryFood = await Foods.find({category: category._id});
-        if(CtgoryFood.length){
-            res.json(CtgoryFood);
+        try{   
+            const {key} = req.params;
+            const category = await Category.findOne({name: key});
+            if(category){    
+                const CtgoryFood = await Foods.find({category: category._id});
+                if(CtgoryFood.length){
+                    res.json(CtgoryFood);
+                } else {
+                    return res.status(204).json({msg: 'NO CONTENT'});
+                }
+            } else {
+                return res.json({msg:'No existe categoria.'})
+            }
+        } catch(err){
+            res.status(500).send(err);
         }
-        return res.status(204).json({msg: 'NO CONTENT'});
     }
 }
