@@ -61,7 +61,7 @@ module.exports = {
                 model: 'Category'
             });
             if(food){
-                res.json(food);
+                res.status(200).json(food);
             } else {
                 return res.status(204).json({msg:'NO CONTENT'});
             }
@@ -72,11 +72,15 @@ module.exports = {
     deleteFood: async (req, res) => {
         const {id} = req.params;
         const food = await Foods.findByIdAndDelete(id);
-        if(food.imageFood === '/images/default/food.jpg'){
-            res.json({message:'Comida eliminada sin imagen.'})
+        if(food){
+            if(food.imageFood === '/images/default/food.jpg'){
+                res.json({message:'Comida eliminada sin imagen.'})
+            } else {
+                await unlink(path.resolve('./src/uploads'+food.imageFood));
+                res.json({message:'Comida eliminada con imagen.'});
+            }
         } else {
-            await unlink(path.resolve('./src/uploads'+food.imageFood));
-            res.json({message:'Comida eliminada con imagen.'});
+            return res.status(300).json({msg:'La comida no existe.'});
         }
     },
     updateFood: async (req, res) => {

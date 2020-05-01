@@ -62,12 +62,21 @@ module.exports = {
     },
     deleteCtgory: async (req, res) => {
         const {id} = req.params;
-        const category = await Category.findByIdAndDelete(id);
-        if(category.imageCtgory === '/images/default/category.jpg'){
-            res.json({message: 'Categoria eliminada sin foto.'});
+        const food = await Foods.find({category:id});
+        if(!food){
+            const category = await Category.findByIdAndDelete(id);
+            if(category){
+                if(category.imageCtgory === '/images/default/category.jpg'){
+                    res.json({message: 'Categoria eliminada sin foto.'});
+                } else {
+                    await unlink(path.resolve('./src/uploads'+category.imageCtgory));
+                    res.json({message: 'Categoria eliminada con foto.'});
+                }
+            } else {
+                return res.status(300).json({msg:'La categoria no existe.'});
+            }
         } else {
-            await unlink(path.resolve('./src/uploads'+category.imageCtgory));
-            res.json({message: 'Categoria eliminada con foto.'});
+            return res.json({msg:'Esta categoria tiene comidas no se puede eliminar.'});
         }
     },
     updateCtgory: async (req, res) => {
