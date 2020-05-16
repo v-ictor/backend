@@ -6,10 +6,25 @@ const Foods = require('../models/Foods');
 module.exports = {
     showFoods: async (req, res) => {
         try{
-            const foods = await Foods.find().populate({
+            const foods = await Foods.find()/*.populate({
                 path: 'category',
                 model: 'Category'
-            });
+            })*/;
+            if(foods.length){
+                res.status(200).json(foods);
+            } else {
+                return res.status(204).json({msg: 'No Content'});
+            }
+        } catch(err){
+            res.status(500).send(err);
+        }
+    },
+    showFoodsEnable: async (req, res) => {
+        try{
+            const foods = await Foods.find({status: true})/*.populate({
+                path: 'category',
+                model: 'Category'
+            })*/;
             if(foods.length){
                 res.status(200).json(foods);
             } else {
@@ -38,7 +53,7 @@ module.exports = {
                     description,
                     price,
                     ingredients,
-                    category: categories._id
+                    category: categories.name
                 });
                 if(!imageFood){
                     await newFood.save();
@@ -56,10 +71,10 @@ module.exports = {
     showFood: async (req, res) => {
         try{
             const {id} = req.params;
-            const food = await Foods.findById(id).populate({
+            const food = await Foods.findById(id)/*.populate({
                 path: 'category',
                 model: 'Category'
-            });
+            })*/;
             if(food){
                 res.status(200).json(food);
             } else {
@@ -93,7 +108,7 @@ module.exports = {
                 title,
                 description,
                 price,
-                category: categories._id,
+                category: categories.name,
                 ingredients
             };
             if(imageFood){
@@ -106,17 +121,47 @@ module.exports = {
                     res.json({msg:'Actualizado con foto 1 con foto'});
                 }
             } else {
-                updFood.imageFood = '/images/default/food.jpg';
+                // updFood.imageFood = '/images/default/food.jpg';
                 const food = await Foods.findByIdAndUpdate(id, updFood);
-                if(food.imageFood === '/images/default/food.jpg'){
-                    res.json({msg:'Actualizado sin foto 1 sin foto'});
-                } else {
-                    await unlink(path.resolve('./src/uploads'+food.imageFood));
-                    res.json({msg:'Actualizado sin foto 1 con foto'});
-                }
+                res.json({msg:'Actualizado'});
+                // if(food.imageFood === '/images/default/food.jpg'){
+                //     res.json({msg:'Actualizado sin foto 1 sin foto'});
+                // } else {
+                //     await unlink(path.resolve('./src/uploads'+food.imageFood));
+                //     res.json({msg:'Actualizado sin foto 1 con foto'});
+                // }
             }
         } catch(err){
             res.status(500).send(err);
+        }
+    },
+    upadteText: async (req, res) => {
+        try{
+            const {id} = req.params;
+            const {title,description,category,price,ingredients} = req.body;
+            const categories = await Category.findOne({name:category});
+            var updFood = {
+                title,
+                description,
+                price,
+                category: categories.name,
+                ingredients
+            };
+            const food = await Foods.findByIdAndUpdate(id, updFood);
+            res.json({msg:'Actualizado', food});
+        } catch(err){
+            res.status(500).send(err);
+        }
+    },
+    enable: async (req, res) => {
+        const {id} = req.params;
+        const foods = await Foods.findById(id);
+        foods.status = !foods.status;
+        await foods.save();
+        if(foods.status === true){
+            res.status(200).json({msg:'La categoria esta habilitada.'})
+        } else {
+            res.status(200).json({msg:'La categoria esta deshabilitada.'})
         }
     }
 };
