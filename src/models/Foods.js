@@ -4,7 +4,7 @@ const FoodsSchema = new Schema({
     title: String,
     description: String,
     imageFood: {type: String, default: '/images/default/food.jpg'},
-    price: String,
+    price: Number,
     ingredients: String,
     // category: [{type: Schema.Types.ObjectId, ref: 'Category'}],
     category: String,

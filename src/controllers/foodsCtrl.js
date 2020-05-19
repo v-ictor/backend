@@ -48,21 +48,54 @@ module.exports = {
                     return res.json({msg:'La comida ya existe.'})
                 }
             } else {
+                var priceN = price;
                 const newFood = new Foods({
                     title,
                     description,
-                    price,
+                    // price: priceN,
                     ingredients,
                     category: categories.name
                 });
-                if(!imageFood){
-                    await newFood.save();
-                    res.json({message:'Comida guardada sin foto.'});
+                if(priceN.indexOf(',') != -1){
+                    priceN = priceN.replace(".","");
+                    priceN = priceN.replace(",",".");
+                    newFood.price = priceN;
+                    // const newFood = new Foods({
+                    //     title,
+                    //     description,
+                    //     price: priceN,
+                    //     ingredients,
+                    //     category: categories.name
+                    // });
+                    if(!imageFood){
+                        await newFood.save();
+                        res.json({message:'Comida guardada sin foto.'});
+                    } else {
+                        newFood.imageFood = '/images/img/'+imageFood.filename;
+                        await newFood.save();
+                        res.json({message:'Comida guardada con foto.'})
+                    }
+                    // res.json({msg: 'con comas.',total: Number(numero)});
                 } else {
-                    newFood.imageFood = '/images/img/'+imageFood.filename;
-                    await newFood.save();
-                    res.json({message:'Comida guardada con foto.'})
+                    newFood.price = priceN;
+                    // const newFood = new Foods({
+                    //     title,
+                    //     description,
+                    //     price: priceN,
+                    //     ingredients,
+                    //     category: categories.name
+                    // });
+                    if(!imageFood){
+                        await newFood.save();
+                        res.json({message:'Comida guardada sin foto.'});
+                    } else {
+                        newFood.imageFood = '/images/img/'+imageFood.filename;
+                        await newFood.save();
+                        res.json({message:'Comida guardada con foto.'})
+                    }
+                    // res.json({msg: 'sin comas.',total: Number(numero)});
                 }
+                
             }
         } catch(err){
             res.status(500).send(err);
@@ -104,33 +137,62 @@ module.exports = {
             const {title,description,category,price,ingredients} = req.body;
             const imageFood = req.file;
             const categories = await Category.findOne({name:category});
+            var priceN = price;
             var updFood = {
                 title,
                 description,
-                price,
+                // price,
                 category: categories.name,
                 ingredients
             };
-            if(imageFood){
-                updFood.imageFood = '/images/img/'+imageFood.filename;
-                const food = await Foods.findByIdAndUpdate(id, updFood);
-                if(food.imageFood === '/images/default/food.jpg'){
-                    res.json({msg:'Actualizado con foto 1 sin foto'});
+            if(priceN.indexOf(',') != -1){
+                priceN = priceN.replace(".","");
+                priceN = priceN.replace(",",".");
+                updFood.price = priceN;
+                if(imageFood){
+                    updFood.imageFood = '/images/img/'+imageFood.filename;
+                    const food = await Foods.findByIdAndUpdate(id, updFood);
+                    if(food.imageFood === '/images/default/food.jpg'){
+                        res.json({msg:'Actualizado con foto 1 sin foto'});
+                    } else {
+                        await unlink(path.resolve('./src/uploads'+food.imageFood));
+                        res.json({msg:'Actualizado con foto 1 con foto'});
+                    }
                 } else {
-                    await unlink(path.resolve('./src/uploads'+food.imageFood));
-                    res.json({msg:'Actualizado con foto 1 con foto'});
+                    // updFood.imageFood = '/images/default/food.jpg';
+                    const food = await Foods.findByIdAndUpdate(id, updFood);
+                    res.json({msg:'Actualizado'});
+                    // if(food.imageFood === '/images/default/food.jpg'){
+                    //     res.json({msg:'Actualizado sin foto 1 sin foto'});
+                    // } else {
+                    //     await unlink(path.resolve('./src/uploads'+food.imageFood));
+                    //     res.json({msg:'Actualizado sin foto 1 con foto'});
+                    // }
                 }
             } else {
-                // updFood.imageFood = '/images/default/food.jpg';
-                const food = await Foods.findByIdAndUpdate(id, updFood);
-                res.json({msg:'Actualizado'});
-                // if(food.imageFood === '/images/default/food.jpg'){
-                //     res.json({msg:'Actualizado sin foto 1 sin foto'});
-                // } else {
-                //     await unlink(path.resolve('./src/uploads'+food.imageFood));
-                //     res.json({msg:'Actualizado sin foto 1 con foto'});
-                // }
+                updFood.price = priceN;
+                if(imageFood){
+                    updFood.imageFood = '/images/img/'+imageFood.filename;
+                    const food = await Foods.findByIdAndUpdate(id, updFood);
+                    if(food.imageFood === '/images/default/food.jpg'){
+                        res.json({msg:'Actualizado con foto 1 sin foto'});
+                    } else {
+                        await unlink(path.resolve('./src/uploads'+food.imageFood));
+                        res.json({msg:'Actualizado con foto 1 con foto'});
+                    }
+                } else {
+                    // updFood.imageFood = '/images/default/food.jpg';
+                    const food = await Foods.findByIdAndUpdate(id, updFood);
+                    res.json({msg:'Actualizado'});
+                    // if(food.imageFood === '/images/default/food.jpg'){
+                    //     res.json({msg:'Actualizado sin foto 1 sin foto'});
+                    // } else {
+                    //     await unlink(path.resolve('./src/uploads'+food.imageFood));
+                    //     res.json({msg:'Actualizado sin foto 1 con foto'});
+                    // }
+                }
             }
+            
         } catch(err){
             res.status(500).send(err);
         }

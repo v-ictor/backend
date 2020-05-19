@@ -21,15 +21,4 @@ router.get('/category/turn/:id', CategoryCtrl.enable);
 
 router.get('/category/:key', CategoryCtrl.showCtgoryFoods);
 
-router.post('/test', (req, res) => {
-    let {numero, text} = req.body;
-    if(numero.indexOf(',') != -1){
-        numero = numero.replace(".","");
-        numero = numero.replace(",",".");
-        res.json({msg: 'con comas.',total: Number(numero)});
-    } else {
-        res.json({msg: 'sin comas.',total: Number(numero)});
-    }
-});
-
 module.exports = router;
