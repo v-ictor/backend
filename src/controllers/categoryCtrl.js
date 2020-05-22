@@ -131,7 +131,7 @@ module.exports = {
             const {key} = req.params;
             const category = await Category.findOne({name: key});
             if(category){    
-                const CtgoryFood = await Foods.find({category: category._id});
+                const CtgoryFood = await Foods.find({category: category.name});
                 if(CtgoryFood.length){
                     res.json(CtgoryFood);
                 } else {
