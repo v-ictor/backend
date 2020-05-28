@@ -221,9 +221,9 @@ module.exports = {
         foods.status = !foods.status;
         await foods.save();
         if(foods.status === true){
-            res.status(200).json({msg:'La categoria esta habilitada.'})
+            res.status(200).json({msg:'La comida esta habilitada.'})
         } else {
-            res.status(200).json({msg:'La categoria esta deshabilitada.'})
+            res.status(200).json({msg:'La comida esta deshabilitada.'})
         }
     }
 };
